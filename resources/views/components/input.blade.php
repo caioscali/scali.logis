@@ -1,0 +1,2 @@
+@props(['name', 'label', 'type' => 'text'])
+<div><label for="{{ $name }}" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">{{ $label }}</label><input id="{{ $name }}" name="{{ $name }}" type="{{ $type }}" {{ $attributes->merge(['class' => 'block w-full rounded-xl border-slate-300 bg-white px-4 py-3 text-sm shadow-sm focus:border-sky-500 focus:ring-sky-500 dark:border-slate-700 dark:bg-slate-800']) }} value="{{ old($name) }}">@error($name)<p class="mt-2 text-sm text-red-500">{{ $message }}</p>@enderror</div>
