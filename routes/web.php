@@ -5,6 +5,7 @@ use App\Domain\Organizations\Http\Controllers\FilialController;
 use App\Domain\Organizations\Http\Controllers\GrupoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\TransportadoraController;
 use App\Domain\Organizations\Http\Controllers\UsuarioTransportadoraController;
+use App\Domain\Registry\Http\Controllers\EquipamentoController;
 use App\Domain\Registry\Http\Controllers\PessoaController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -95,5 +96,23 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::get('/{pessoa}', [PessoaController::class, 'show'])->name('show');
         Route::get('/{pessoa}/editar', [PessoaController::class, 'edit'])->name('edit');
         Route::put('/vinculos/{transportadoraPessoa}', [PessoaController::class, 'update'])->name('update');
+    });
+
+    Route::middleware('enterprise.context')->group(function (): void {
+        Route::get('/veiculos', [EquipamentoController::class, 'veiculos'])->name('veiculos.index');
+        Route::get('/veiculos/criar', [EquipamentoController::class, 'criarVeiculo'])->name('veiculos.create');
+        Route::post('/veiculos', [EquipamentoController::class, 'armazenarVeiculo'])->name('veiculos.store');
+        Route::get('/veiculos/pesquisar', [EquipamentoController::class, 'pesquisarVeiculo'])->middleware('throttle:pessoas-pesquisa')->name('veiculos.pesquisar');
+        Route::get('/veiculos/{veiculo}', [EquipamentoController::class, 'mostrarVeiculo'])->name('veiculos.show');
+        Route::get('/veiculos/{veiculo}/editar', [EquipamentoController::class, 'editarVeiculo'])->name('veiculos.edit');
+        Route::put('/veiculos/vinculos/{transportadoraVeiculo}', [EquipamentoController::class, 'atualizarVeiculo'])->name('veiculos.update');
+
+        Route::get('/implementos', [EquipamentoController::class, 'implementos'])->name('implementos.index');
+        Route::get('/implementos/criar', [EquipamentoController::class, 'criarImplemento'])->name('implementos.create');
+        Route::post('/implementos', [EquipamentoController::class, 'armazenarImplemento'])->name('implementos.store');
+        Route::get('/implementos/pesquisar', [EquipamentoController::class, 'pesquisarImplemento'])->middleware('throttle:pessoas-pesquisa')->name('implementos.pesquisar');
+        Route::get('/implementos/{implemento}', [EquipamentoController::class, 'mostrarImplemento'])->name('implementos.show');
+        Route::get('/implementos/{implemento}/editar', [EquipamentoController::class, 'editarImplemento'])->name('implementos.edit');
+        Route::put('/implementos/vinculos/{transportadoraImplemento}', [EquipamentoController::class, 'atualizarImplemento'])->name('implementos.update');
     });
 });

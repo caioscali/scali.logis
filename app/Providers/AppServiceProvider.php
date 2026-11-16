@@ -4,8 +4,12 @@ namespace App\Providers;
 
 use App\Domain\Organizations\Models\UsuarioFilial;
 use App\Domain\Organizations\Models\UsuarioTransportadora;
+use App\Domain\Registry\Models\Implemento;
 use App\Domain\Registry\Models\Pessoa;
+use App\Domain\Registry\Models\Veiculo;
+use App\Domain\Registry\Policies\ImplementoPolicy;
 use App\Domain\Registry\Policies\PessoaPolicy;
+use App\Domain\Registry\Policies\VeiculoPolicy;
 use App\Policies\UsuarioFilialPolicy;
 use App\Policies\UsuarioTransportadoraPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -33,6 +37,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(UsuarioTransportadora::class, UsuarioTransportadoraPolicy::class);
         Gate::policy(UsuarioFilial::class, UsuarioFilialPolicy::class);
         Gate::policy(Pessoa::class, PessoaPolicy::class);
+        Gate::policy(Veiculo::class, VeiculoPolicy::class);
+        Gate::policy(Implemento::class, ImplementoPolicy::class);
 
         RateLimiter::for('login', function (Request $request): Limit {
             return Limit::perMinute(5)->by(
