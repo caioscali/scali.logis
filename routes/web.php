@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Organizations\Http\Controllers\ContextoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\FilialController;
 use App\Domain\Organizations\Http\Controllers\GrupoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\TransportadoraController;
@@ -42,7 +43,10 @@ Route::middleware('auth')->group(function (): void {
 });
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
-    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/contexto/selecionar', [ContextoEmpresarialController::class, 'index'])->name('contexto.selecionar');
+    Route::post('/contexto/selecionar', [ContextoEmpresarialController::class, 'store'])->name('contexto.selecionar.store');
+    Route::get('/contexto/sem-vinculo', [ContextoEmpresarialController::class, 'semVinculo'])->name('contexto.sem-vinculo');
+    Route::get('/dashboard', DashboardController::class)->middleware('enterprise.context')->name('dashboard');
 
     Route::middleware('platform.admin')->prefix('admin')->name('admin.')->group(function (): void {
         Route::get('grupos-empresariais', [GrupoEmpresarialController::class, 'index'])->name('grupos-empresariais.index');

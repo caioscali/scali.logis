@@ -2,11 +2,14 @@
 
 namespace App\Http\Middleware;
 
+use App\Domain\Organizations\Services\ContextoEmpresarial;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
+    public function __construct(private ContextoEmpresarial $contextoEmpresarial) {}
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -43,6 +46,7 @@ class HandleInertiaRequests extends Middleware
                     'is_platform_administrator' => $request->user()->isPlatformAdministrator(),
                 ],
             ],
+            'contexto' => $this->contextoEmpresarial->dadosCompartilhados($request, $request->user()),
         ];
     }
 }
