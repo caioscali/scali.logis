@@ -72,6 +72,45 @@ class OrganizationStructureTest extends TestCase
         $this->assertSame($transportadora->id, $filial->transportadora->id);
     }
 
+    public function test_route_transportadora_is_the_only_owner_of_a_new_filial(): void
+    {
+        $admin = User::factory()->create(['email' => 'admin@scali.dev', 'email_verified_at' => now()]);
+        $owner = Transportadora::factory()->create();
+        $attacker = Transportadora::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.transportadoras.filiais.store', $owner), [
+            'transportadora_id' => $attacker->id,
+            'nome' => 'Filial protegida',
+            'cnpj' => null,
+            'cidade' => 'São Paulo',
+            'uf' => 'SP',
+        ]);
+
+        $response->assertRedirect(route('admin.transportadoras.filiais.index', $owner));
+        $this->assertDatabaseHas('filiais', ['transportadora_id' => $owner->id, 'nome' => 'Filial protegida']);
+        $this->assertDatabaseMissing('filiais', ['transportadora_id' => $attacker->id, 'nome' => 'Filial protegida']);
+    }
+
+    public function test_filial_from_another_transportadora_cannot_be_updated_through_a_manipulated_route(): void
+    {
+        $admin = User::factory()->create(['email' => 'admin@scali.dev', 'email_verified_at' => now()]);
+        $owner = Transportadora::factory()->create();
+        $other = Transportadora::factory()->create();
+        $filial = Filial::factory()->for($owner)->create();
+
+        $this->actingAs($admin)
+            ->put(route('admin.transportadoras.filiais.update', [$other, $filial]), [
+                'nome' => 'Transferida',
+                'cidade' => 'Rio de Janeiro',
+                'uf' => 'RJ',
+                'matriz' => false,
+                'ativo' => true,
+            ])
+            ->assertNotFound();
+
+        $this->assertDatabaseHas('filiais', ['id' => $filial->id, 'transportadora_id' => $owner->id, 'nome' => $filial->nome]);
+    }
+
     public function test_duplicate_cnpj_in_the_same_entity_is_rejected(): void
     {
         $admin = User::factory()->create(['email' => 'admin@scali.dev', 'email_verified_at' => now()]);
@@ -102,6 +141,34 @@ class OrganizationStructureTest extends TestCase
 
         $this->expectException(ValidationException::class);
         Filial::factory()->for($transportadora)->create(['matriz' => true]);
+    }
+
+    public function test_matrix_cannot_be_unset_or_deactivated_by_a_manipulated_request(): void
+    {
+        $admin = User::factory()->create(['email' => 'admin@scali.dev', 'email_verified_at' => now()]);
+        $transportadora = Transportadora::factory()->create();
+        $matriz = Filial::factory()->for($transportadora)->create(['matriz' => true, 'ativo' => true]);
+
+        $this->actingAs($admin)->put(route('admin.transportadoras.filiais.update', [$transportadora, $matriz]), [
+            'nome' => $matriz->nome,
+            'cidade' => $matriz->cidade,
+            'uf' => $matriz->uf,
+            'matriz' => false,
+            'ativo' => false,
+        ])->assertSessionHasErrors('matriz');
+
+        $this->assertDatabaseHas('filiais', ['id' => $matriz->id, 'matriz' => true, 'ativo' => true]);
+    }
+
+    public function test_matrix_cannot_be_deleted_by_a_request(): void
+    {
+        $admin = User::factory()->create(['email' => 'admin@scali.dev', 'email_verified_at' => now()]);
+        $transportadora = Transportadora::factory()->create();
+        $matriz = Filial::factory()->for($transportadora)->create(['matriz' => true]);
+
+        $this->actingAs($admin)->delete(route('admin.transportadoras.filiais.destroy', [$transportadora, $matriz]))
+            ->assertSessionHasErrors('filial');
+        $this->assertDatabaseHas('filiais', ['id' => $matriz->id, 'matriz' => true]);
     }
 
     public function test_dependencies_are_preserved_when_parent_deletion_is_attempted(): void

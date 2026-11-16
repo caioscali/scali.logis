@@ -37,7 +37,11 @@ class FilialController extends Controller
      */
     public function store(StoreFilialRequest $request, Transportadora $transportadora): RedirectResponse
     {
-        $transportadora->filiais()->create($request->validated());
+        $transportadora->filiais()->create([
+            ...$request->validated(),
+            'matriz' => $request->boolean('matriz'),
+            'ativo' => $request->boolean('ativo', true),
+        ]);
 
         return to_route('admin.transportadoras.filiais.index', $transportadora)->with('success', 'Filial criada.');
     }
@@ -68,7 +72,7 @@ class FilialController extends Controller
     public function update(UpdateFilialRequest $request, Transportadora $transportadora, Filial $filial): RedirectResponse
     {
         abort_unless($filial->transportadora_id === $transportadora->id, 404);
-        $filial->update($request->validated());
+        $filial->update($request->safe()->except(['transportadora_id']));
 
         return to_route('admin.transportadoras.filiais.index', $transportadora)->with('success', 'Filial atualizada.');
     }

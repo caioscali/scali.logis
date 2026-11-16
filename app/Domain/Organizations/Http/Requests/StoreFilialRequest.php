@@ -24,7 +24,6 @@ class StoreFilialRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'transportadora_id' => ['required', 'integer', 'exists:transportadoras,id'],
             'nome' => ['required', 'string', 'max:255'],
             'cnpj' => ['nullable', new Cnpj, 'unique:filiais,cnpj'],
             'cidade' => ['required', 'string', 'max:120'],

@@ -25,7 +25,6 @@ class UpdateFilialRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'transportadora_id' => ['required', 'integer', 'exists:transportadoras,id'],
             'nome' => ['required', 'string', 'max:255'],
             'cnpj' => ['nullable', new Cnpj, Rule::unique('filiais', 'cnpj')->ignore($this->route('filial'))],
             'cidade' => ['required', 'string', 'max:120'],
