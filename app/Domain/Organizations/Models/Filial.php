@@ -6,6 +6,7 @@ use Database\Factories\Domain\Organizations\Models\FilialFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\ValidationException;
 
 class Filial extends Model
@@ -52,5 +53,10 @@ class Filial extends Model
     public function transportadora(): BelongsTo
     {
         return $this->belongsTo(Transportadora::class);
+    }
+
+    public function usuariosFiliais(): HasMany
+    {
+        return $this->hasMany(UsuarioFilial::class);
     }
 }

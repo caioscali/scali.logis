@@ -141,6 +141,27 @@ A criação de uma transportadora é transacional e cria sua filial matriz no
 mesmo fluxo. CNPJs são normalizados para somente números e validados antes de
 serem persistidos. A matriz possui índice único por transportadora e registros
 com dependências não podem ser excluídos.
+
+### Usuários, transportadoras e filiais
+
+O cadastro de usuários é único na tabela \`users\`. As tabelas
+\`usuarios_transportadoras\` e \`usuarios_filiais\` representam, respectivamente,
+o perfil do usuário em cada transportadora e as filiais operacionais
+autorizadas nesse vínculo. Um mesmo usuário pode ter perfis diferentes em
+transportadoras distintas, sem duplicar sua conta.
+
+Os perfis atuais são \`administrador\`, \`gerente\`, \`operador\` e \`consulta\`.
+Somente administradores ativos da transportadora ou administradores da
+plataforma podem gerenciar vínculos. A autorização é verificada no servidor,
+vínculos inativos não concedem acesso e filiais inativas não são autorizáveis.
+O administrador da plataforma pode administrar vínculos, mas não recebe acesso
+operacional automático a uma transportadora.
+
+O sistema valida que a filial pertence à transportadora do vínculo, inclusive
+por uma trigger PostgreSQL. A administração usa uma transportadora explícita
+na rota; a seleção de contexto operacional e o seletor global ficam para a
+Sprint 02.3. Convites, permissões granulares e cadastro global de pessoas ainda
+não fazem parte desta etapa.
 - Regeneração e invalidação de sessão
 - Rate limiting para login, registro, recuperação e envio de verificação
 
