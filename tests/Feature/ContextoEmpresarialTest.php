@@ -122,6 +122,22 @@ class ContextoEmpresarialTest extends TestCase
         $this->actingAs($platform)->get(route('dashboard'))->assertRedirect(route('contexto.sem-vinculo'));
     }
 
+    public function test_unsafe_context_destination_falls_back_to_dashboard(): void
+    {
+        $user = User::factory()->create(['email_verified_at' => now()]);
+        [$transportadora, $filial] = $this->createContext($user);
+
+        foreach (['https://example.com/roubar', '//example.com/roubar', 'javascript:alert(1)', '/\\\\example.com/roubar'] as $destino) {
+            $this->actingAs($user)
+                ->withSession(['contexto.url_destino' => $destino])
+                ->post(route('contexto.selecionar.store'), [
+                    'transportadora_id' => $transportadora->id,
+                    'filial_id' => $filial->id,
+                ])
+                ->assertRedirect(route('dashboard'));
+        }
+    }
+
     /**
      * @return array{0: Transportadora, 1: Filial}
      */
