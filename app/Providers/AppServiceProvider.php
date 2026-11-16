@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Domain\Finance\Models\ContaBancaria;
+use App\Domain\Finance\Policies\ContaBancariaPolicy;
 use App\Domain\Organizations\Models\UsuarioFilial;
 use App\Domain\Organizations\Models\UsuarioTransportadora;
 use App\Domain\Registry\Models\Implemento;
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(UsuarioTransportadora::class, UsuarioTransportadoraPolicy::class);
         Gate::policy(UsuarioFilial::class, UsuarioFilialPolicy::class);
         Gate::policy(Pessoa::class, PessoaPolicy::class);
+        Gate::policy(ContaBancaria::class, ContaBancariaPolicy::class);
         Gate::policy(Veiculo::class, VeiculoPolicy::class);
         Gate::policy(Implemento::class, ImplementoPolicy::class);
 
@@ -47,6 +50,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('pessoas-pesquisa', function (Request $request): Limit {
+            return Limit::perMinute(10)->by(($request->user()?->id ?? 'guest').'|'.$request->ip());
+        });
+
+        RateLimiter::for('contas-pesquisa', function (Request $request): Limit {
             return Limit::perMinute(10)->by(($request->user()?->id ?? 'guest').'|'.$request->ip());
         });
     }

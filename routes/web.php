@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Finance\Http\Controllers\ContaBancariaController;
 use App\Domain\Organizations\Http\Controllers\ContextoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\FilialController;
 use App\Domain\Organizations\Http\Controllers\GrupoEmpresarialController;
@@ -114,5 +115,15 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::get('/implementos/{implemento}', [EquipamentoController::class, 'mostrarImplemento'])->name('implementos.show');
         Route::get('/implementos/{implemento}/editar', [EquipamentoController::class, 'editarImplemento'])->name('implementos.edit');
         Route::put('/implementos/vinculos/{transportadoraImplemento}', [EquipamentoController::class, 'atualizarImplemento'])->name('implementos.update');
+
+        Route::prefix('contas-bancarias')->name('contas-bancarias.')->group(function (): void {
+            Route::get('/', [ContaBancariaController::class, 'index'])->name('index');
+            Route::get('/criar', [ContaBancariaController::class, 'create'])->name('create');
+            Route::post('/', [ContaBancariaController::class, 'store'])->name('store');
+            Route::get('/pesquisar-pessoa', [ContaBancariaController::class, 'pesquisarPessoa'])->middleware('throttle:contas-pesquisa')->name('pesquisar-pessoa');
+            Route::put('/vinculos/{transportadoraContaBancaria}', [ContaBancariaController::class, 'update'])->name('update');
+            Route::get('/{contaBancaria}', [ContaBancariaController::class, 'show'])->name('show');
+            Route::get('/{contaBancaria}/editar', [ContaBancariaController::class, 'edit'])->name('edit');
+        });
     });
 });
