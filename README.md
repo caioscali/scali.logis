@@ -235,6 +235,27 @@ transportadora pode somente ativar ou desativar seu vínculo. Para correções,
 deve ser cadastrada ou adotada uma nova conta. Não há consulta externa de
 titularidade, exportação global, histórico de pagamentos ou seleção para
 conjuntos de transporte ainda.
+
+### Conjuntos de transporte
+
+Um conjunto em `conjuntos_transporte` reúne, no contexto de uma transportadora,
+motorista, transportador, veículo, composição, carroceria e uma conta de
+pagamento. Os implementos ficam em `conjuntos_implementos`, com posição e
+restrições de unicidade por conjunto. Todos os componentes precisam possuir
+adoção local ativa; motorista e transportador também precisam ter as funções
+correspondentes no vínculo da transportadora.
+
+As contas elegíveis pertencem obrigatoriamente ao motorista ou ao transportador
+selecionado e precisam estar adotadas e ativas. Os dados completos da conta não
+são expostos na montagem do conjunto. As composições iniciais são caminhão,
+cavalo + semirreboque, carreta LS, bitrem e rodotrem, com quantidades simples
+de implementos definidas pelo Enum. A posição não identifica o tipo físico do
+implemento nem substitui homologação regulatória.
+
+Configurações não são editadas destrutivamente. A duplicação cria um novo
+conjunto e preserva o anterior para consultas históricas; somente a situação
+ativa/inativa pode ser alterada. Ordens de carregamento, contratos e pagamentos
+operacionais ainda não fazem parte desta etapa.
 - Regeneração e invalidação de sessão
 - Rate limiting para login, registro, recuperação e envio de verificação
 
