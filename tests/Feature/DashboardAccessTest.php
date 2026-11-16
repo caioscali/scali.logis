@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Organizations\Models\Filial;
+use App\Domain\Organizations\Models\Transportadora;
+use App\Domain\Organizations\Models\UsuarioTransportadora;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -19,6 +22,10 @@ class DashboardAccessTest extends TestCase
     public function test_verified_users_can_access_the_dashboard(): void
     {
         $user = User::factory()->create(['email_verified_at' => now()]);
+        $transportadora = Transportadora::factory()->create();
+        $filial = Filial::factory()->for($transportadora)->create(['ativo' => true]);
+        $vinculo = UsuarioTransportadora::factory()->for($user, 'usuario')->for($transportadora)->create();
+        $vinculo->usuarioFiliais()->create(['filial_id' => $filial->id]);
 
         $this->actingAs($user)
             ->get(route('dashboard'))
