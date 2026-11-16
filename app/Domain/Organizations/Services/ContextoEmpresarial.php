@@ -119,6 +119,31 @@ class ContextoEmpresarial
         ];
     }
 
+    public function vinculoAtual(Request $request, User $usuario): ?UsuarioTransportadora
+    {
+        $transportadoraId = $request->session()->get(self::TRANSPORTADORA_SESSION_KEY);
+        $filialId = $request->session()->get(self::FILIAL_SESSION_KEY);
+
+        if (! is_numeric($transportadoraId) || ! is_numeric($filialId)) {
+            return null;
+        }
+
+        $vinculo = UsuarioTransportadora::query()
+            ->where('user_id', $usuario->id)
+            ->where('transportadora_id', (int) $transportadoraId)
+            ->where('ativo', true)
+            ->first();
+
+        if ($vinculo === null || ! $vinculo->usuarioFiliais()
+            ->where('filial_id', (int) $filialId)
+            ->whereHas('filial', fn ($query) => $query->where('ativo', true))
+            ->exists()) {
+            return null;
+        }
+
+        return $vinculo;
+    }
+
     public function selecionar(Request $request, User $usuario, int $transportadoraId, int $filialId): void
     {
         $vinculo = UsuarioTransportadora::query()

@@ -178,9 +178,28 @@ O middleware de contexto não é aplicado às rotas de autenticação, seleção
 administração global ou administração de vínculos.
 
 A Sprint 02.3 prepara o mecanismo de contexto para os próximos módulos, mas
-ainda não cria tabelas operacionais nem implementa filtros de cargas, ordens,
-financeiro ou cadastros globais. Cada módulo futuro deverá combinar o contexto
-com suas próprias Policies e regras de propriedade.
+ainda não cria tabelas operacionais nem implementa filtros de cargas, ordens ou
+financeiro. Cada módulo futuro deverá combinar o contexto com suas próprias
+Policies e regras de propriedade.
+
+### Cadastro único de pessoas
+
+O domínio Registry mantém uma pessoa uma única vez na tabela `pessoas`. Os
+vínculos em `transportadoras_pessoas` e as funções em `pessoas_funcoes` são
+locais à transportadora ativa. Uma pessoa pode ser adotada por várias
+transportadoras e exercer mais de uma função sem duplicar o cadastro global.
+
+CPF e CNPJ são normalizados e validados antes da gravação. A pesquisa global
+aceita somente o documento exato, é autenticada, limitada por rate limiting e
+retorna dados mínimos quando a pessoa ainda não pertence à transportadora
+ativa. A adoção reutiliza os dados existentes sem sobrescrevê-los. Nesta etapa,
+as alterações de dados compartilhados ficam bloqueadas após a adoção; a edição
+disponível altera somente o vínculo local e suas funções.
+
+Usuários com perfil administrador, gerente ou operador podem cadastrar, adotar
+e alterar funções no contexto ativo. Usuários de consulta somente visualizam
+os vínculos autorizados. Pessoas com vínculos não podem ser excluídas e não há
+exportação global ou cadastros separados de motoristas e transportadores.
 - Regeneração e invalidação de sessão
 - Rate limiting para login, registro, recuperação e envio de verificação
 

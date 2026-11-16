@@ -1,0 +1,16 @@
+import { Link, router } from '@inertiajs/react';
+import { Edit3, Plus, Search } from 'lucide-react';
+import AdminLayout from '../../../Layouts/AdminLayout';
+import { Button } from '../../../components/ui/button';
+
+type Person = { id: number; nome: string; tipo: string; documento: string; funcoes: string[]; ativo: boolean };
+type Paginator = { current_page: number; last_page: number; links: { url: string | null; label: string; active: boolean }[] };
+type Carrier = { id: number; nome: string };
+
+export default function Index({ transportadora, pessoas, paginator, busca }: { transportadora: Carrier; pessoas: Person[]; paginator: Paginator; busca: string }) {
+    return <AdminLayout title="Pessoas">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-semibold uppercase tracking-widest text-sky-600">Cadastro único</p><h1 className="mt-2 text-3xl font-bold">Pessoas</h1><p className="mt-2 text-slate-500">Pessoas vinculadas a {transportadora.nome} no contexto ativo.</p></div><Button asChild><Link href="/pessoas/criar"><Plus size={16} /> Nova pessoa</Link></Button></div>
+        <form className="mt-8 flex max-w-xl gap-2" onSubmit={(event) => { event.preventDefault(); const data = new FormData(event.currentTarget); router.get('/pessoas', { busca: data.get('busca') }, { preserveState: true }); }}><input name="busca" defaultValue={busca} placeholder="Buscar por nome ou documento" className="min-w-0 flex-1 rounded-xl border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900" /><Button type="submit"><Search size={16} /> Buscar</Button></form>
+        <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"><div className="divide-y divide-slate-100 dark:divide-slate-800">{pessoas.length === 0 && <p className="p-8 text-center text-slate-500">Nenhuma pessoa vinculada encontrada.</p>}{pessoas.map((pessoa) => <div key={pessoa.id} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"><div><div className="flex flex-wrap items-center gap-2"><h2 className="font-semibold">{pessoa.nome}</h2><span className="rounded-full bg-sky-100 px-2 py-1 text-xs font-semibold text-sky-700">{pessoa.tipo === 'fisica' ? 'Pessoa física' : 'Pessoa jurídica'}</span><span className={pessoa.ativo ? 'rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700' : 'rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-500'}>{pessoa.ativo ? 'Ativa' : 'Inativa'}</span></div><p className="mt-1 text-sm text-slate-500">{pessoa.documento} · {pessoa.funcoes.join(', ') || 'Sem função atribuída'}</p></div><div className="flex gap-2"><Button variant="ghost" className="px-2" asChild><Link href={'/pessoas/' + pessoa.id}><span>Ver</span></Link></Button><Button variant="ghost" className="px-2" asChild><Link href={'/pessoas/' + pessoa.id + '/editar'}><Edit3 size={16} /> Editar</Link></Button></div></div>)}</div><div className="flex gap-2 p-4">{paginator.links.map((link) => <Link key={link.label} href={link.url ?? '#'} className={link.active ? 'rounded-lg bg-sky-100 px-3 py-2 text-sm font-semibold text-sky-700' : 'rounded-lg px-3 py-2 text-sm text-slate-500'} dangerouslySetInnerHTML={{ __html: link.label }} />)}</div></div>
+    </AdminLayout>;
+}

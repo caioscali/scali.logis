@@ -5,6 +5,7 @@ use App\Domain\Organizations\Http\Controllers\FilialController;
 use App\Domain\Organizations\Http\Controllers\GrupoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\TransportadoraController;
 use App\Domain\Organizations\Http\Controllers\UsuarioTransportadoraController;
+use App\Domain\Registry\Http\Controllers\PessoaController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -85,4 +86,14 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
             Route::put('/{usuarioTransportadora}', [UsuarioTransportadoraController::class, 'update'])->name('update');
             Route::delete('/{usuarioTransportadora}', [UsuarioTransportadoraController::class, 'destroy'])->name('destroy');
         });
+
+    Route::middleware('enterprise.context')->prefix('pessoas')->name('pessoas.')->group(function (): void {
+        Route::get('/', [PessoaController::class, 'index'])->name('index');
+        Route::get('/criar', [PessoaController::class, 'create'])->name('create');
+        Route::post('/', [PessoaController::class, 'store'])->name('store');
+        Route::get('/pesquisar', [PessoaController::class, 'pesquisar'])->middleware('throttle:pessoas-pesquisa')->name('pesquisar');
+        Route::get('/{pessoa}', [PessoaController::class, 'show'])->name('show');
+        Route::get('/{pessoa}/editar', [PessoaController::class, 'edit'])->name('edit');
+        Route::put('/vinculos/{transportadoraPessoa}', [PessoaController::class, 'update'])->name('update');
+    });
 });
