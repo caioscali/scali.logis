@@ -215,6 +215,26 @@ limiting. A adoção reutiliza o cadastro global sem modificar cidade ou placa;
 somente o vínculo local pode ser ativado ou desativado. A colisão entre
 veículo e implemento é protegida por bloqueio transacional no PostgreSQL, sem
 criar tabela auxiliar. Equipamentos com vínculos não podem ser excluídos.
+
+### Contas bancárias e PIX
+
+O módulo financeiro inicial mantém o cadastro global de contas em
+`contas_bancarias` e a adoção local em `transportadoras_contas_bancarias`.
+Uma conta pertence a uma pessoa global existente e só pode ser adotada quando
+essa pessoa estiver vinculada e ativa na transportadora atual. A mesma conta
+pode ser adotada por mais de uma transportadora sem duplicar seus dados.
+
+Agência, número da conta, dígito e chave PIX usam os casts criptografados do
+Laravel e não são incluídos no compartilhamento global do Inertia. Listagens e
+pesquisas exibem apenas identificações mascaradas. A exibição integral e a
+cópia individual ficam restritas ao administrador empresarial; a interface
+avisa quando um valor é copiado para fora da proteção da aplicação.
+
+Nesta etapa, dados bancários globais não são editados depois da adoção. A
+transportadora pode somente ativar ou desativar seu vínculo. Para correções,
+deve ser cadastrada ou adotada uma nova conta. Não há consulta externa de
+titularidade, exportação global, histórico de pagamentos ou seleção para
+conjuntos de transporte ainda.
 - Regeneração e invalidação de sessão
 - Rate limiting para login, registro, recuperação e envio de verificação
 
