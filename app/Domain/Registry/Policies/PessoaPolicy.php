@@ -18,7 +18,8 @@ class PessoaPolicy
 
     public function view(User $user, Pessoa $pessoa): bool
     {
-        return $this->cadastroPessoas->podeConsultar(app(Request::class), $user);
+        return $this->cadastroPessoas->podeConsultar(app(Request::class), $user)
+            && $this->cadastroPessoas->pessoaNoContexto(app(Request::class), $user, $pessoa);
     }
 
     public function create(User $user): bool
@@ -28,7 +29,8 @@ class PessoaPolicy
 
     public function update(User $user, Pessoa $pessoa): bool
     {
-        return $this->cadastroPessoas->podeModificar(app(Request::class), $user);
+        return $this->cadastroPessoas->podeModificar(app(Request::class), $user)
+            && $this->cadastroPessoas->pessoaNoContexto(app(Request::class), $user, $pessoa);
     }
 
     public function delete(User $user, Pessoa $pessoa): bool

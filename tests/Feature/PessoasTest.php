@@ -109,6 +109,61 @@ class PessoasTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_authorized_user_can_edit_only_local_functions_and_status(): void
+    {
+        Transportadora::factory()->create();
+        [$user, $transportadora] = $this->contexto(PerfilAcesso::Operador);
+        $pessoa = Pessoa::factory()->create(['nome' => 'Nome compartilhado', 'documento' => '52998224725']);
+        $pessoaFiller = Pessoa::factory()->create(['documento' => '11222333000181']);
+        TransportadoraPessoa::factory()->for($transportadora)->for($pessoaFiller)->create();
+        $vinculoPessoa = TransportadoraPessoa::factory()->for($transportadora)->for($pessoa)->create();
+        $vinculoUsuario = $user->vinculosTransportadoras()->firstOrFail();
+
+        $this->assertNotSame($vinculoUsuario->id, $vinculoPessoa->id);
+        $this->assertNotSame($vinculoUsuario->id, $vinculoPessoa->transportadora_id);
+
+        $this->actingAs($user)->put(route('pessoas.update', $vinculoPessoa), [
+            'ativo' => false,
+            'funcoes' => ['cliente'],
+            'nome' => 'Tentativa de alterar dado global',
+            'documento' => '11222333000181',
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('transportadoras_pessoas', ['id' => $vinculoPessoa->id, 'ativo' => false]);
+        $this->assertDatabaseHas('pessoas', ['id' => $pessoa->id, 'nome' => 'Nome compartilhado', 'documento' => '52998224725']);
+        $this->assertDatabaseHas('pessoas_funcoes', ['transportadora_pessoa_id' => $vinculoPessoa->id, 'funcao' => 'cliente']);
+    }
+
+    public function test_context_switch_is_required_before_editing_a_person(): void
+    {
+        $user = User::factory()->create();
+        [$primeira, $filialA] = $this->criarVinculo($user, 'A', PerfilAcesso::Administrador);
+        [$segunda, $filialB] = $this->criarVinculo($user, 'B', PerfilAcesso::Administrador);
+        $pessoa = Pessoa::factory()->create(['documento' => '52998224725']);
+        $vinculoPessoa = TransportadoraPessoa::factory()->for($segunda)->for($pessoa)->create();
+
+        $this->selecionarContexto($user, $primeira, $filialA);
+        $this->actingAs($user)->put(route('pessoas.update', $vinculoPessoa), ['ativo' => false, 'funcoes' => []])->assertForbidden();
+        $this->assertDatabaseHas('transportadoras_pessoas', ['id' => $vinculoPessoa->id, 'ativo' => true]);
+
+        $this->selecionarContexto($user, $segunda, $filialB);
+        $this->actingAs($user)->put(route('pessoas.update', $vinculoPessoa), ['ativo' => false, 'funcoes' => []])->assertRedirect();
+        $this->assertDatabaseHas('transportadoras_pessoas', ['id' => $vinculoPessoa->id, 'ativo' => false]);
+    }
+
+    public function test_direct_edit_url_for_person_from_another_transportadora_is_forbidden(): void
+    {
+        $user = User::factory()->create();
+        [$primeira, $filialA] = $this->criarVinculo($user, 'A', PerfilAcesso::Gerente);
+        [$segunda] = $this->criarVinculo($user, 'B', PerfilAcesso::Gerente);
+        $pessoa = Pessoa::factory()->create(['documento' => '52998224725']);
+        TransportadoraPessoa::factory()->for($segunda)->for($pessoa)->create();
+
+        $this->selecionarContexto($user, $primeira, $filialA);
+        $this->actingAs($user)->get(route('pessoas.edit', $pessoa))->assertForbidden();
+        $this->actingAs($user)->get(route('pessoas.show', $pessoa))->assertForbidden();
+    }
+
     public function test_inactive_local_link_is_not_listed_or_operationally_accessible(): void
     {
         [$user, $transportadora, $filial] = $this->contexto(PerfilAcesso::Administrador);
@@ -132,7 +187,7 @@ class PessoasTest extends TestCase
         $this->actingAs($user)->get(route('pessoas.pesquisar', ['tipo' => 'fisica', 'documento' => $pessoa->documento]))
             ->assertJsonPath('existe', true)
             ->assertJsonPath('pessoa.nome', null);
-        $this->actingAs($user)->get(route('pessoas.show', $pessoa))->assertNotFound();
+        $this->actingAs($user)->get(route('pessoas.show', $pessoa))->assertForbidden();
         $this->assertNotSame($filialB->id, session('contexto.filial_id'));
     }
 

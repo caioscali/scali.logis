@@ -30,6 +30,16 @@ class CadastroPessoas
         return $this->contextoEmpresarial->vinculoAtual($request, $usuario)?->perfil->podeGerenciarPessoas() ?? false;
     }
 
+    public function pessoaNoContexto(Request $request, User $usuario, Pessoa $pessoa): bool
+    {
+        $vinculo = $this->vinculoAtual($request, $usuario);
+
+        return $vinculo !== null
+            && $pessoa->transportadoras()
+                ->where('transportadora_id', $vinculo->transportadora_id)
+                ->exists();
+    }
+
     /**
      * @return array{transportadora: array{id: int, nome: string}, pessoas: array<int, array<string, mixed>>, paginator: array<string, mixed>, busca: string}
      */
@@ -179,7 +189,7 @@ class CadastroPessoas
     {
         $contexto = $this->vinculoAtual($request, $usuario);
 
-        if ($contexto === null || $contexto->transportadora_id !== $vinculo->transportadora_id || ! $contexto->perfil->podeGerenciarPessoas()) {
+        if ($contexto === null || $contexto->transportadora_id !== $vinculo->transportadora_id || ! $contexto->perfil->podeGerenciarPessoas() || $vinculo->pessoa === null || ! $this->pessoaNoContexto($request, $usuario, $vinculo->pessoa)) {
             abort(403);
         }
     }
