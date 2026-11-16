@@ -3,6 +3,7 @@
 use App\Domain\Organizations\Http\Controllers\FilialController;
 use App\Domain\Organizations\Http\Controllers\GrupoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\TransportadoraController;
+use App\Domain\Organizations\Http\Controllers\UsuarioTransportadoraController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -67,4 +68,17 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
         Route::put('transportadoras/{transportadora}/filiais/{filial}', [FilialController::class, 'update'])->name('transportadoras.filiais.update');
         Route::delete('transportadoras/{transportadora}/filiais/{filial}', [FilialController::class, 'destroy'])->name('transportadoras.filiais.destroy');
     });
+
+    Route::middleware('enterprise.user.admin')
+        ->prefix('admin/transportadoras/{transportadora}/usuarios')
+        ->name('admin.transportadoras.usuarios.')
+        ->group(function (): void {
+            Route::get('/', [UsuarioTransportadoraController::class, 'index'])->name('index');
+            Route::get('/create', [UsuarioTransportadoraController::class, 'create'])->name('create');
+            Route::post('/', [UsuarioTransportadoraController::class, 'store'])->name('store');
+            Route::get('/{usuarioTransportadora}', [UsuarioTransportadoraController::class, 'show'])->name('show');
+            Route::get('/{usuarioTransportadora}/edit', [UsuarioTransportadoraController::class, 'edit'])->name('edit');
+            Route::put('/{usuarioTransportadora}', [UsuarioTransportadoraController::class, 'update'])->name('update');
+            Route::delete('/{usuarioTransportadora}', [UsuarioTransportadoraController::class, 'destroy'])->name('destroy');
+        });
 });

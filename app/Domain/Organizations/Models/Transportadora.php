@@ -30,6 +30,11 @@ class Transportadora extends Model
         return $this->hasMany(Filial::class);
     }
 
+    public function usuariosTransportadoras(): HasMany
+    {
+        return $this->hasMany(UsuarioTransportadora::class);
+    }
+
     public function matriz(): HasMany
     {
         return $this->filiais()->where('matriz', true);
