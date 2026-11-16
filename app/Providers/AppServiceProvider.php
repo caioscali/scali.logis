@@ -6,9 +6,11 @@ use App\Domain\Finance\Models\ContaBancaria;
 use App\Domain\Finance\Policies\ContaBancariaPolicy;
 use App\Domain\Organizations\Models\UsuarioFilial;
 use App\Domain\Organizations\Models\UsuarioTransportadora;
+use App\Domain\Registry\Models\ConjuntoTransporte;
 use App\Domain\Registry\Models\Implemento;
 use App\Domain\Registry\Models\Pessoa;
 use App\Domain\Registry\Models\Veiculo;
+use App\Domain\Registry\Policies\ConjuntoTransportePolicy;
 use App\Domain\Registry\Policies\ImplementoPolicy;
 use App\Domain\Registry\Policies\PessoaPolicy;
 use App\Domain\Registry\Policies\VeiculoPolicy;
@@ -42,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(ContaBancaria::class, ContaBancariaPolicy::class);
         Gate::policy(Veiculo::class, VeiculoPolicy::class);
         Gate::policy(Implemento::class, ImplementoPolicy::class);
+        Gate::policy(ConjuntoTransporte::class, ConjuntoTransportePolicy::class);
 
         RateLimiter::for('login', function (Request $request): Limit {
             return Limit::perMinute(5)->by(
