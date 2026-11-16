@@ -200,6 +200,21 @@ Usuários com perfil administrador, gerente ou operador podem cadastrar, adotar
 e alterar funções no contexto ativo. Usuários de consulta somente visualizam
 os vínculos autorizados. Pessoas com vínculos não podem ser excluídas e não há
 exportação global ou cadastros separados de motoristas e transportadores.
+
+### Veículos e implementos
+
+Veículos e implementos possuem cadastros globais mínimos nas tabelas `veiculos`
+e `implementos`. As tabelas `transportadoras_veiculos` e
+`transportadoras_implementos` registram a adoção e a situação local de cada
+equipamento. Placas são normalizadas em maiúsculas, aceitam os formatos
+brasileiro antigo e Mercosul e não podem ser duplicadas dentro de sua categoria
+nem usadas simultaneamente nas duas categorias.
+
+A pesquisa exata por placa exige autenticação, contexto empresarial e rate
+limiting. A adoção reutiliza o cadastro global sem modificar cidade ou placa;
+somente o vínculo local pode ser ativado ou desativado. A colisão entre
+veículo e implemento é protegida por bloqueio transacional no PostgreSQL, sem
+criar tabela auxiliar. Equipamentos com vínculos não podem ser excluídos.
 - Regeneração e invalidação de sessão
 - Rate limiting para login, registro, recuperação e envio de verificação
 
