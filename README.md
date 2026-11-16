@@ -128,6 +128,19 @@ Os fluxos disponíveis são:
 - Recuperação e redefinição de senha
 - Verificação de e-mail
 - Proteção do dashboard por auth e verified
+
+## Administração empresarial
+
+O cadastro inicial de grupos empresariais, transportadoras e filiais fica
+protegido por \`auth\`, \`verified\` e pelo middleware administrativo provisório
+\`platform.admin\`. Durante esta sprint, somente os e-mails listados em
+\`PLATFORM_ADMIN_EMAILS\` podem acessar essas rotas. Essa lista será substituída
+pela autorização multiempresa definitiva na Sprint 02.2.
+
+A criação de uma transportadora é transacional e cria sua filial matriz no
+mesmo fluxo. CNPJs são normalizados para somente números e validados antes de
+serem persistidos. A matriz possui índice único por transportadora e registros
+com dependências não podem ser excluídos.
 - Regeneração e invalidação de sessão
 - Rate limiting para login, registro, recuperação e envio de verificação
 

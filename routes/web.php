@@ -1,5 +1,8 @@
 <?php
 
+use App\Domain\Organizations\Http\Controllers\FilialController;
+use App\Domain\Organizations\Http\Controllers\GrupoEmpresarialController;
+use App\Domain\Organizations\Http\Controllers\TransportadoraController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -39,4 +42,29 @@ Route::middleware('auth')->group(function (): void {
 
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    Route::middleware('platform.admin')->prefix('admin')->name('admin.')->group(function (): void {
+        Route::get('grupos-empresariais', [GrupoEmpresarialController::class, 'index'])->name('grupos-empresariais.index');
+        Route::get('grupos-empresariais/create', [GrupoEmpresarialController::class, 'create'])->name('grupos-empresariais.create');
+        Route::post('grupos-empresariais', [GrupoEmpresarialController::class, 'store'])->name('grupos-empresariais.store');
+        Route::get('grupos-empresariais/{grupoEmpresarial}/edit', [GrupoEmpresarialController::class, 'edit'])->name('grupos-empresariais.edit');
+        Route::put('grupos-empresariais/{grupoEmpresarial}', [GrupoEmpresarialController::class, 'update'])->name('grupos-empresariais.update');
+        Route::delete('grupos-empresariais/{grupoEmpresarial}', [GrupoEmpresarialController::class, 'destroy'])->name('grupos-empresariais.destroy');
+
+        Route::get('transportadoras', [TransportadoraController::class, 'index'])->name('transportadoras.index');
+        Route::get('transportadoras/create', [TransportadoraController::class, 'create'])->name('transportadoras.create');
+        Route::post('transportadoras', [TransportadoraController::class, 'store'])->name('transportadoras.store');
+        Route::get('transportadoras/{transportadora}', [TransportadoraController::class, 'show'])->name('transportadoras.show');
+        Route::get('transportadoras/{transportadora}/edit', [TransportadoraController::class, 'edit'])->name('transportadoras.edit');
+        Route::put('transportadoras/{transportadora}', [TransportadoraController::class, 'update'])->name('transportadoras.update');
+        Route::delete('transportadoras/{transportadora}', [TransportadoraController::class, 'destroy'])->name('transportadoras.destroy');
+
+        Route::get('transportadoras/{transportadora}/filiais', [FilialController::class, 'index'])->name('transportadoras.filiais.index');
+        Route::get('transportadoras/{transportadora}/filiais/create', [FilialController::class, 'create'])->name('transportadoras.filiais.create');
+        Route::post('transportadoras/{transportadora}/filiais', [FilialController::class, 'store'])->name('transportadoras.filiais.store');
+        Route::get('transportadoras/{transportadora}/filiais/{filial}', [FilialController::class, 'show'])->name('transportadoras.filiais.show');
+        Route::get('transportadoras/{transportadora}/filiais/{filial}/edit', [FilialController::class, 'edit'])->name('transportadoras.filiais.edit');
+        Route::put('transportadoras/{transportadora}/filiais/{filial}', [FilialController::class, 'update'])->name('transportadoras.filiais.update');
+        Route::delete('transportadoras/{transportadora}/filiais/{filial}', [FilialController::class, 'destroy'])->name('transportadoras.filiais.destroy');
+    });
 });
