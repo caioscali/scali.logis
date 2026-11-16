@@ -2,6 +2,7 @@
 
 namespace App\Domain\Registry\Models;
 
+use App\Domain\Finance\Models\ContaBancaria;
 use App\Domain\Registry\Enums\TipoPessoa;
 use Database\Factories\Domain\Registry\Models\PessoaFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -41,5 +42,10 @@ class Pessoa extends Model
     public function transportadoras(): HasMany
     {
         return $this->hasMany(TransportadoraPessoa::class);
+    }
+
+    public function contasBancarias(): HasMany
+    {
+        return $this->hasMany(ContaBancaria::class);
     }
 }

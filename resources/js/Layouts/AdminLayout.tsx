@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { BookUser, Building2, ChevronLeft, LogOut, Moon, Sun, Truck, Wrench } from 'lucide-react';
+import { BookUser, Building2, ChevronLeft, CreditCard, LogOut, Moon, Sun, Truck, Wrench } from 'lucide-react';
 import { PropsWithChildren, useState } from 'react';
 import { Button } from '../components/ui/button';
 import { ContextoSelector } from '../components/ContextoSelector';
@@ -34,6 +34,7 @@ export default function AdminLayout({ children, title, backHref }: Props) {
                             {contexto.atual !== null && <Link href="/pessoas" className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-sky-700 dark:hover:bg-slate-800 sm:inline-flex"><BookUser size={16} /> Pessoas</Link>}
                             {contexto.atual !== null && <Link href="/veiculos" className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-sky-700 dark:hover:bg-slate-800 sm:inline-flex"><Truck size={16} /> Veículos</Link>}
                             {contexto.atual !== null && <Link href="/implementos" className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-sky-700 dark:hover:bg-slate-800 sm:inline-flex"><Wrench size={16} /> Implementos</Link>}
+                            {contexto.atual !== null && <Link href="/contas-bancarias" className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-100 hover:text-sky-700 dark:hover:bg-slate-800 sm:inline-flex"><CreditCard size={16} /> Contas</Link>}
                             <Button variant="ghost" className="px-2" onClick={toggleTheme} aria-label="Alternar tema">{dark ? <Sun size={18} /> : <Moon size={18} />}</Button>
                             <Button variant="ghost" className="px-2" onClick={() => router.post('/logout')} aria-label="Sair"><LogOut size={18} /></Button>
                         </div>
