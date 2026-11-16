@@ -99,6 +99,21 @@ return [
 
     'key' => env('APP_KEY'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Temporary platform administrators
+    |--------------------------------------------------------------------------
+    |
+    | This allow-list is an interim control for the Organizations module until
+    | the definitive tenant and permission model is delivered.
+    |
+    */
+
+    'platform_admin_emails' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env('PLATFORM_ADMIN_EMAILS', ''))
+    ))),
+
     'previous_keys' => [
         ...array_filter(
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))

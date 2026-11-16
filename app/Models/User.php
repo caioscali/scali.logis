@@ -29,4 +29,9 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    public function isPlatformAdministrator(): bool
+    {
+        return in_array(strtolower($this->email), array_map('strtolower', config('app.platform_admin_emails', [])), true);
+    }
 }
