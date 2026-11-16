@@ -159,9 +159,28 @@ operacional automático a uma transportadora.
 
 O sistema valida que a filial pertence à transportadora do vínculo, inclusive
 por uma trigger PostgreSQL. A administração usa uma transportadora explícita
-na rota; a seleção de contexto operacional e o seletor global ficam para a
-Sprint 02.3. Convites, permissões granulares e cadastro global de pessoas ainda
+na rota. Convites, permissões granulares e cadastro global de pessoas ainda
 não fazem parte desta etapa.
+
+### Contexto empresarial
+
+Após o login, o usuário seleciona uma transportadora e uma filial entre os
+vínculos ativos e as autorizações de filial disponíveis para sua conta. Quando
+existe somente uma opção, o contexto é selecionado automaticamente. A escolha
+fica na sessão autenticada, sem criar tabelas adicionais, e é validada pelo
+servidor em cada requisição operacional.
+
+O cabeçalho permite trocar o contexto durante a navegação. Vínculos
+desativados, filiais inativas e autorizações revogadas invalidam a sessão de
+contexto e exigem nova seleção. Administradores da plataforma continuam com
+acesso global administrativo, mas não recebem acesso operacional automático.
+O middleware de contexto não é aplicado às rotas de autenticação, seleção,
+administração global ou administração de vínculos.
+
+A Sprint 02.3 prepara o mecanismo de contexto para os próximos módulos, mas
+ainda não cria tabelas operacionais nem implementa filtros de cargas, ordens,
+financeiro ou cadastros globais. Cada módulo futuro deverá combinar o contexto
+com suas próprias Policies e regras de propriedade.
 - Regeneração e invalidação de sessão
 - Rate limiting para login, registro, recuperação e envio de verificação
 

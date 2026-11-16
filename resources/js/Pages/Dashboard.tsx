@@ -2,6 +2,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { BarChart3, ChevronDown, LayoutDashboard, LogOut, Menu, Moon, Settings2, Sun, Truck, X } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../components/ui/button';
+import { ContextoSelector } from '../components/ContextoSelector';
 import { cn } from '../lib/utils';
 
 type PageProps = {
@@ -59,7 +60,7 @@ export default function Dashboard() {
                     </div>
                 </aside>
                 <main className="min-w-0 flex-1">
-                    <header className="flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4 dark:border-slate-800 dark:bg-slate-900 md:px-10"><div className="flex items-center gap-3"><Button variant="ghost" className="px-2 md:hidden" aria-label="Abrir menu" onClick={() => setMobileOpen(true)}><Menu size={21} /></Button><div><p className="text-sm text-slate-500">Painel principal</p><h1 className="text-xl font-bold">Olá, {auth.user.name}</h1></div></div><Button variant="outline" className="px-3" onClick={toggleTheme}>{dark ? <Sun size={17} /> : <Moon size={17} />}<span className="hidden sm:inline">Tema</span></Button></header>
+                    <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-4 dark:border-slate-800 dark:bg-slate-900 md:px-10"><div className="flex items-center gap-3"><Button variant="ghost" className="px-2 md:hidden" aria-label="Abrir menu" onClick={() => setMobileOpen(true)}><Menu size={21} /></Button><div><p className="text-sm text-slate-500">Painel principal</p><h1 className="text-xl font-bold">Olá, {auth.user.name}</h1></div></div><div className="flex items-center gap-2"><ContextoSelector /><Button variant="outline" className="px-3" onClick={toggleTheme}>{dark ? <Sun size={17} /> : <Moon size={17} />}<span className="hidden sm:inline">Tema</span></Button></div></header>
                     <section className="p-5 md:p-10"><div className="rounded-3xl bg-gradient-to-br from-sky-600 to-indigo-700 p-7 text-white shadow-xl shadow-sky-900/10 md:p-10"><p className="text-sm font-medium text-sky-100">Fundação do projeto</p><h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">Sua operação começa aqui.</h2><p className="mt-4 max-w-2xl text-sky-100">O Scali Logis está preparado para receber os módulos que conectam sua empresa, equipe e operação em um só lugar.</p></div><div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[['Status da conta', 'Ativa', 'text-emerald-500'], ['Próxima etapa', 'Configuração', 'text-slate-950 dark:text-white'], ['Ambiente', 'Scali Logis', 'text-slate-950 dark:text-white']].map(([label, value, color]) => <div key={label} className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"><p className="text-sm text-slate-500">{label}</p><p className={cn('mt-3 text-2xl font-bold', color)}>{value}</p></div>)}</div><div className="mt-8 flex items-center gap-2 text-sm text-slate-500"><ChevronDown size={16} /> Módulos empresariais e operacionais serão adicionados nas próximas etapas.</div></section>
                 </main>
             </div>

@@ -2,6 +2,7 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Building2, ChevronLeft, LogOut, Moon, Sun, Truck } from 'lucide-react';
 import { PropsWithChildren, useState } from 'react';
 import { Button } from '../components/ui/button';
+import { ContextoSelector } from '../components/ContextoSelector';
 import { cn } from '../lib/utils';
 
 type Props = PropsWithChildren<{ title: string; backHref?: string }>;
@@ -29,6 +30,7 @@ export default function AdminLayout({ children, title, backHref }: Props) {
                             <span className="hidden text-sm font-medium text-slate-500 md:block">Administração empresarial</span>
                         </div>
                         <div className="flex items-center gap-2">
+                            <ContextoSelector />
                             <Button variant="ghost" className="px-2" onClick={toggleTheme} aria-label="Alternar tema">{dark ? <Sun size={18} /> : <Moon size={18} />}</Button>
                             <Button variant="ghost" className="px-2" onClick={() => router.post('/logout')} aria-label="Sair"><LogOut size={18} /></Button>
                         </div>
