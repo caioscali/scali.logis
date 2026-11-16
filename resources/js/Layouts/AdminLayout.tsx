@@ -7,7 +7,7 @@ import { cn } from '../lib/utils';
 type Props = PropsWithChildren<{ title: string; backHref?: string }>;
 
 export default function AdminLayout({ children, title, backHref }: Props) {
-    const { auth } = usePage<{ auth: { user: { name: string; email: string } } }>().props;
+    const { auth } = usePage<{ auth: { user: { name: string; email: string; is_platform_administrator: boolean } } }>().props;
     const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
 
     function toggleTheme() {
@@ -36,10 +36,10 @@ export default function AdminLayout({ children, title, backHref }: Props) {
                 </header>
                 <main className="mx-auto max-w-7xl px-5 py-8 md:px-8 md:py-10">
                     {backHref && <Link href={backHref} className="mb-5 inline-flex items-center gap-1 text-sm font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400"><ChevronLeft size={16} /> Voltar</Link>}
-                    <nav className="mb-8 flex flex-wrap gap-2">
+                    {auth.user.is_platform_administrator && <nav className="mb-8 flex flex-wrap gap-2">
                         <Link href="/admin/grupos-empresariais" className={cn('inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold', title.includes('Grupo') ? 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900')}><Building2 size={16} /> Grupos</Link>
                         <Link href="/admin/transportadoras" className={cn('inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold', title.includes('Transportadora') || title.includes('Filial') ? 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900')}><Truck size={16} /> Transportadoras</Link>
-                    </nav>
+                    </nav>}
                     {children}
                 </main>
                 <footer className="mx-auto max-w-7xl px-5 pb-8 text-xs text-slate-400 md:px-8">Olá, {auth.user.name} · Controle provisório de plataforma</footer>
