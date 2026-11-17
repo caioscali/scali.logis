@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Finance\Http\Controllers\ContaBancariaController;
+use App\Domain\LoadingOrders\Http\Controllers\OrdemCarregamentoController;
 use App\Domain\Organizations\Http\Controllers\ContextoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\FilialController;
 use App\Domain\Organizations\Http\Controllers\GrupoEmpresarialController;
@@ -133,6 +134,17 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
             Route::post('/', [ConjuntoTransporteController::class, 'store'])->name('store');
             Route::get('/{conjunto}', [ConjuntoTransporteController::class, 'show'])->name('show');
             Route::put('/{conjunto}', [ConjuntoTransporteController::class, 'update'])->name('update');
+        });
+
+        Route::prefix('ordens-carregamento')->name('ordens-carregamento.')->group(function (): void {
+            Route::get('/', [OrdemCarregamentoController::class, 'index'])->name('index');
+            Route::get('/criar', [OrdemCarregamentoController::class, 'create'])->name('create');
+            Route::post('/', [OrdemCarregamentoController::class, 'store'])->name('store');
+            Route::get('/{ordem}/editar', [OrdemCarregamentoController::class, 'edit'])->name('edit');
+            Route::put('/{ordem}', [OrdemCarregamentoController::class, 'update'])->name('update');
+            Route::get('/{ordem}', [OrdemCarregamentoController::class, 'show'])->name('show');
+            Route::post('/{ordem}/emitir', [OrdemCarregamentoController::class, 'emit'])->name('emit');
+            Route::post('/{ordem}/cancelar', [OrdemCarregamentoController::class, 'cancel'])->name('cancel');
         });
     });
 });

@@ -117,7 +117,11 @@ Os domínios foram reservados em app/Domain:
 - Documents
 - Integrations
 
-Até o momento, esses diretórios são apenas fronteiras arquiteturais. Não foram criadas tabelas multiempresa ou tabelas operacionais.
+O módulo LoadingOrders implementa o cadastro e a consulta de Ordens de Carregamento em `ordens_carregamento`. A ordem é numerada por transportadora com lock transacional, pertence à filial do contexto ativo e possui as situações `rascunho`, `emitida` e `cancelada`. Rascunhos podem ser editados; ordens emitidas ou canceladas permanecem no histórico e não podem ser excluídas fisicamente.
+
+Clientes são pessoas globais com vínculo ativo e função `cliente`. Conjuntos precisam estar ativos e possuir motorista, transportador, veículo e conta de pagamento elegíveis na transportadora. A ordem mantém a referência ao conjunto e um snapshot dos nomes, placas e identificação mascarada da conta no momento da contratação; a identificação bancária é armazenada com cast criptografado e nunca é exibida integralmente.
+
+O serviço de domínio separa `dadosExportaveis()['operacionais']` de `['financeiros']` para a futura integração com Google Planilhas. Esta sprint não gera PDF, não integra Google, não registra CFC e não implementa financeiro mensal, descontos ou pagamentos.
 
 ## Autenticação
 
