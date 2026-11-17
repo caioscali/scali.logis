@@ -6,6 +6,7 @@ use App\Domain\Organizations\Http\Controllers\FilialController;
 use App\Domain\Organizations\Http\Controllers\GrupoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\TransportadoraController;
 use App\Domain\Organizations\Http\Controllers\UsuarioTransportadoraController;
+use App\Domain\Registry\Http\Controllers\ConjuntoTransporteController;
 use App\Domain\Registry\Http\Controllers\EquipamentoController;
 use App\Domain\Registry\Http\Controllers\PessoaController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -124,6 +125,14 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
             Route::put('/vinculos/{transportadoraContaBancaria}', [ContaBancariaController::class, 'update'])->name('update');
             Route::get('/{contaBancaria}', [ContaBancariaController::class, 'show'])->name('show');
             Route::get('/{contaBancaria}/editar', [ContaBancariaController::class, 'edit'])->name('edit');
+        });
+
+        Route::prefix('conjuntos-transporte')->name('conjuntos-transporte.')->group(function (): void {
+            Route::get('/', [ConjuntoTransporteController::class, 'index'])->name('index');
+            Route::get('/criar', [ConjuntoTransporteController::class, 'create'])->name('create');
+            Route::post('/', [ConjuntoTransporteController::class, 'store'])->name('store');
+            Route::get('/{conjunto}', [ConjuntoTransporteController::class, 'show'])->name('show');
+            Route::put('/{conjunto}', [ConjuntoTransporteController::class, 'update'])->name('update');
         });
     });
 });
