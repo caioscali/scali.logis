@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Domain\Finance\Models\ContaBancaria;
 use App\Domain\Finance\Policies\ContaBancariaPolicy;
+use App\Domain\FreightContracts\Models\ContratoFreteCarreto;
+use App\Domain\FreightContracts\Policies\ContratoFreteCarretoPolicy;
 use App\Domain\LoadingOrders\Contracts\GoogleDriveClient;
 use App\Domain\LoadingOrders\Contracts\GoogleSheetsClient;
 use App\Domain\LoadingOrders\Models\OrdemCarregamento;
@@ -54,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Implemento::class, ImplementoPolicy::class);
         Gate::policy(ConjuntoTransporte::class, ConjuntoTransportePolicy::class);
         Gate::policy(OrdemCarregamento::class, OrdemCarregamentoPolicy::class);
+        Gate::policy(ContratoFreteCarreto::class, ContratoFreteCarretoPolicy::class);
 
         RateLimiter::for('login', function (Request $request): Limit {
             return Limit::perMinute(5)->by(

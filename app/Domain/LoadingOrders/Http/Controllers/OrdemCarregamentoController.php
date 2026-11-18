@@ -2,6 +2,10 @@
 
 namespace App\Domain\LoadingOrders\Http\Controllers;
 
+use App\Domain\FreightContracts\Http\Requests\StoreContratoFreteRequest;
+use App\Domain\FreightContracts\Http\Requests\UpdateContratoFreteRequest;
+use App\Domain\FreightContracts\Models\ContratoFreteCarreto;
+use App\Domain\FreightContracts\Services\CadastroContratosFreteCarreto;
 use App\Domain\LoadingOrders\Exceptions\GeracaoPdfOrdemException;
 use App\Domain\LoadingOrders\Http\Requests\StoreOrdemCarregamentoRequest;
 use App\Domain\LoadingOrders\Http\Requests\UpdateOrdemCarregamentoRequest;
@@ -18,7 +22,7 @@ use Inertia\Response;
 
 class OrdemCarregamentoController extends Controller
 {
-    public function __construct(private CadastroOrdensCarregamento $cadastro, private GeradorPdfOrdem $geradorPdf) {}
+    public function __construct(private CadastroOrdensCarregamento $cadastro, private GeradorPdfOrdem $geradorPdf, private CadastroContratosFreteCarreto $cadastroContratos) {}
 
     public function index(Request $request): Response
     {
@@ -62,7 +66,7 @@ class OrdemCarregamentoController extends Controller
         Gate::authorize('view', $ordem);
         $ordem = $this->cadastro->obter($request, $request->user(), $ordem);
 
-        return Inertia::render('LoadingOrders/Show', ['ordem' => $ordem, 'pode_emitir' => $this->cadastro->podeEmitir($request, $request->user()), 'pode_cancelar' => $this->cadastro->podeCancelar($request, $request->user()), 'pode_gerar_pdf' => Gate::forUser($request->user())->allows('generatePdf', $ordem), 'google_configurado' => filled(config('google.sheets.template_id')) && filled(config('google.credentials'))]);
+        return Inertia::render('LoadingOrders/Show', ['ordem' => $ordem, 'pode_emitir' => $this->cadastro->podeEmitir($request, $request->user()), 'pode_cancelar' => $this->cadastro->podeCancelar($request, $request->user()), 'pode_gerar_pdf' => Gate::forUser($request->user())->allows('generatePdf', $ordem), 'google_configurado' => filled(config('google.sheets.template_id')) && filled(config('google.credentials')), 'contratos_frete' => $this->cadastroContratos->dadosParaConsulta($request, $request->user(), $ordem)]);
     }
 
     public function emit(Request $request, OrdemCarregamento $ordem): RedirectResponse
@@ -99,5 +103,29 @@ class OrdemCarregamentoController extends Controller
         abort_unless(Storage::disk('local')->exists($ordem->pdf_caminho), 404);
 
         return Storage::disk('local')->download($ordem->pdf_caminho, basename($ordem->pdf_caminho), ['Content-Type' => 'application/pdf']);
+    }
+
+    public function storeContrato(StoreContratoFreteRequest $request, OrdemCarregamento $ordem): RedirectResponse
+    {
+        Gate::authorize('create', [ContratoFreteCarreto::class, $ordem]);
+        $this->cadastroContratos->registrar($request, $request->user(), $ordem, $request->validated());
+
+        return back()->with('success', 'CFC registrado para conferência.');
+    }
+
+    public function updateContrato(UpdateContratoFreteRequest $request, OrdemCarregamento $ordem, ContratoFreteCarreto $contrato): RedirectResponse
+    {
+        Gate::authorize('update', [$contrato, $ordem]);
+        $this->cadastroContratos->atualizar($request, $request->user(), $ordem, $contrato, $request->validated());
+
+        return back()->with('success', 'CFC atualizado; a conferência anterior foi invalidada.');
+    }
+
+    public function confirmarContrato(Request $request, OrdemCarregamento $ordem, ContratoFreteCarreto $contrato): RedirectResponse
+    {
+        Gate::authorize('confirm', [$contrato, $ordem]);
+        $this->cadastroContratos->conferir($request, $request->user(), $ordem, $contrato);
+
+        return back()->with('success', 'CFC conferido com sucesso.');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Domain\LoadingOrders\Models;
 
+use App\Domain\FreightContracts\Models\ContratoFreteCarreto;
 use App\Domain\LoadingOrders\Enums\SituacaoOrdem;
 use App\Domain\Organizations\Models\Filial;
 use App\Domain\Organizations\Models\Transportadora;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Validation\ValidationException;
 
 class OrdemCarregamento extends Model
@@ -93,5 +95,10 @@ class OrdemCarregamento extends Model
     public function situacaoAlteradaPor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'situacao_alterada_por');
+    }
+
+    public function contratosFrete(): HasMany
+    {
+        return $this->hasMany(ContratoFreteCarreto::class, 'ordem_carregamento_id');
     }
 }
