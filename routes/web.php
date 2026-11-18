@@ -147,6 +147,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
             Route::post('/{ordem}/cancelar', [OrdemCarregamentoController::class, 'cancel'])->name('cancel');
             Route::post('/{ordem}/pdf', [OrdemCarregamentoController::class, 'generatePdf'])->name('pdf.generate');
             Route::get('/{ordem}/pdf', [OrdemCarregamentoController::class, 'downloadPdf'])->name('pdf.download');
+            Route::post('/{ordem}/contratos-frete', [OrdemCarregamentoController::class, 'storeContrato'])->name('contratos-frete.store');
+            Route::put('/{ordem}/contratos-frete/{contrato}', [OrdemCarregamentoController::class, 'updateContrato'])->name('contratos-frete.update');
+            Route::post('/{ordem}/contratos-frete/{contrato}/conferir', [OrdemCarregamentoController::class, 'confirmarContrato'])->name('contratos-frete.confirm');
         });
     });
 });
