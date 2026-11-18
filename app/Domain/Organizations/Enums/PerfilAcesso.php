@@ -24,6 +24,11 @@ enum PerfilAcesso: string
         return $this->podeAlterarDados();
     }
 
+    public function podeCancelarOrdem(): bool
+    {
+        return in_array($this, [self::Administrador, self::Gerente], true);
+    }
+
     public static function valores(): array
     {
         return array_column(self::cases(), 'value');
