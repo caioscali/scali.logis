@@ -121,7 +121,28 @@ O módulo LoadingOrders implementa o cadastro e a consulta de Ordens de Carregam
 
 Clientes são pessoas globais com vínculo ativo e função `cliente`. Conjuntos precisam estar ativos e possuir motorista, transportador, veículo e conta de pagamento elegíveis na transportadora. A ordem mantém a referência ao conjunto e um snapshot dos nomes, placas e identificação mascarada da conta no momento da contratação; a identificação bancária é armazenada com cast criptografado e nunca é exibida integralmente.
 
-O serviço de domínio separa `dadosExportaveis()['operacionais']` de `['financeiros']` para a futura integração com Google Planilhas. Esta sprint não gera PDF, não integra Google, não registra CFC e não implementa financeiro mensal, descontos ou pagamentos.
+O serviço de domínio separa `dadosExportaveis()['operacionais']` de `['financeiros']`; a geração documental usa exclusivamente o primeiro conjunto. Esta etapa não registra CFC e não implementa financeiro mensal, descontos ou pagamentos.
+
+### PDF operacional da Ordem de Carregamento
+
+A geração do PDF usa uma cópia temporária de uma planilha-modelo no Google Drive. O Scali Logis preenche essa cópia pela Google Sheets API, exporta o resultado como PDF pela Google Drive API, valida a assinatura `%PDF-`, salva o arquivo no disco privado `local` e remove a cópia temporária. O banco continua sendo a fonte oficial; a planilha não é usada como banco de dados.
+
+Configure, apenas no ambiente de execução, as variáveis abaixo:
+
+```dotenv
+GOOGLE_APPLICATION_CREDENTIALS=/caminho/fora/publico/google-service-account.json
+GOOGLE_SHEETS_TEMPLATE_ID=ID_DA_PLANILHA_MODELO
+GOOGLE_DRIVE_FOLDER_ID=ID_DA_PASTA_TEMPORARIA
+GOOGLE_API_TIMEOUT=15
+```
+
+Ative Google Sheets API e Google Drive API no Google Cloud. Compartilhe a planilha-modelo e, se usado, a pasta de trabalho com o e-mail da conta de serviço com permissão mínima de Editor. O JSON nunca deve ser versionado, exposto pelo servidor web ou registrado em logs. O modelo precisa ser operacional e não conter valores financeiros em células, abas, fórmulas, comentários ou metadados.
+
+O mapeamento padrão de campos para células fica em `config/google.php` e pode ser ajustado quando o modelo oficial estiver disponível. A lista é consumida por `MapeamentoOrdem`; somente o subconjunto operacional do snapshot histórico é enviado à API. Frete, adiantamento, saldo, contratos, descontos, dados bancários e PIX não são enviados nem ocultados no PDF.
+
+PDFs ficam em `ordens-carregamento/{transportadora}/{filial}/{numero}` no disco privado, com referência em `pdf_caminho`, `pdf_gerado_em` e `pdf_gerado_por`. A geração é autorizada apenas para administradores, gerentes e operadores no contexto ativo de uma ordem emitida. Usuários de consulta podem baixar documentos existentes autorizados. O download resolve o arquivo pelo ID da ordem, nunca por um caminho recebido do navegador; ordens canceladas preservam seu PDF histórico.
+
+Sem credenciais ou ID de modelo, a integração permanece indisponível e a interface informa `Google Planilhas ainda não configurado para geração do PDF.`. Falhas de API, timeout, PDF inválido e armazenamento não alteram a ordem e permitem nova tentativa. A remoção de uma cópia temporária com falha é registrada sem expor credenciais.
 
 ## Autenticação
 

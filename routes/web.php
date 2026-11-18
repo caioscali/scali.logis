@@ -145,6 +145,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
             Route::get('/{ordem}', [OrdemCarregamentoController::class, 'show'])->name('show');
             Route::post('/{ordem}/emitir', [OrdemCarregamentoController::class, 'emit'])->name('emit');
             Route::post('/{ordem}/cancelar', [OrdemCarregamentoController::class, 'cancel'])->name('cancel');
+            Route::post('/{ordem}/pdf', [OrdemCarregamentoController::class, 'generatePdf'])->name('pdf.generate');
+            Route::get('/{ordem}/pdf', [OrdemCarregamentoController::class, 'downloadPdf'])->name('pdf.download');
         });
     });
 });

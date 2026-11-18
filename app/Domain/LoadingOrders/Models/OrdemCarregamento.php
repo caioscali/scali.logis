@@ -29,6 +29,7 @@ class OrdemCarregamento extends Model
         'valor_frete', 'valor_adiantamento', 'valor_saldo', 'observacoes', 'created_by',
         'situacao_alterada_por', 'situacao_alterada_em', 'snapshot_motorista_nome', 'snapshot_transportador_nome',
         'snapshot_veiculo_placa', 'snapshot_implementos_placas', 'snapshot_cliente_nome', 'snapshot_conta_pagamento',
+        'pdf_caminho', 'pdf_gerado_em', 'pdf_gerado_por',
     ];
 
     protected $hidden = ['snapshot_conta_pagamento'];
@@ -60,6 +61,7 @@ class OrdemCarregamento extends Model
             'situacao_alterada_em' => 'datetime',
             'snapshot_implementos_placas' => 'array',
             'snapshot_conta_pagamento' => 'encrypted',
+            'pdf_gerado_em' => 'datetime',
         ];
     }
 
