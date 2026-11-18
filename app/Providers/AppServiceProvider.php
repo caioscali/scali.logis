@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use App\Domain\Finance\Models\ContaBancaria;
 use App\Domain\Finance\Policies\ContaBancariaPolicy;
+use App\Domain\LoadingOrders\Contracts\GoogleDriveClient;
+use App\Domain\LoadingOrders\Contracts\GoogleSheetsClient;
 use App\Domain\LoadingOrders\Models\OrdemCarregamento;
 use App\Domain\LoadingOrders\Policies\OrdemCarregamentoPolicy;
+use App\Domain\LoadingOrders\Services\GoogleApiClient;
 use App\Domain\Organizations\Models\UsuarioFilial;
 use App\Domain\Organizations\Models\UsuarioTransportadora;
 use App\Domain\Registry\Models\ConjuntoTransporte;
@@ -32,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(GoogleApiClient::class);
+        $this->app->alias(GoogleApiClient::class, GoogleSheetsClient::class);
+        $this->app->alias(GoogleApiClient::class, GoogleDriveClient::class);
         //
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Domain\LoadingOrders\Policies;
 
+use App\Domain\LoadingOrders\Enums\SituacaoOrdem;
 use App\Domain\LoadingOrders\Models\OrdemCarregamento;
 use App\Domain\LoadingOrders\Services\CadastroOrdensCarregamento;
 use App\Models\User;
@@ -44,5 +45,19 @@ class OrdemCarregamentoPolicy
     public function delete(User $user, OrdemCarregamento $ordem): bool
     {
         return false;
+    }
+
+    public function generatePdf(User $user, OrdemCarregamento $ordem): bool
+    {
+        return $this->cadastro->podeCriar(app(Request::class), $user)
+            && $this->cadastro->pertenceAoContexto(app(Request::class), $user, $ordem)
+            && $ordem->situacao === SituacaoOrdem::Emitida;
+    }
+
+    public function downloadPdf(User $user, OrdemCarregamento $ordem): bool
+    {
+        return $this->cadastro->podeConsultar(app(Request::class), $user)
+            && $this->cadastro->pertenceAoContexto(app(Request::class), $user, $ordem)
+            && $ordem->pdf_caminho !== null;
     }
 }
