@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Finance\Http\Controllers\ContaBancariaController;
+use App\Domain\Finance\Http\Controllers\LancamentoFinanceiroController;
 use App\Domain\LoadingOrders\Http\Controllers\OrdemCarregamentoController;
 use App\Domain\Organizations\Http\Controllers\ContextoEmpresarialController;
 use App\Domain\Organizations\Http\Controllers\FilialController;
@@ -150,6 +151,14 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
             Route::post('/{ordem}/contratos-frete', [OrdemCarregamentoController::class, 'storeContrato'])->name('contratos-frete.store');
             Route::put('/{ordem}/contratos-frete/{contrato}', [OrdemCarregamentoController::class, 'updateContrato'])->name('contratos-frete.update');
             Route::post('/{ordem}/contratos-frete/{contrato}/conferir', [OrdemCarregamentoController::class, 'confirmarContrato'])->name('contratos-frete.confirm');
+        });
+
+        Route::prefix('lancamentos-financeiros')->name('lancamentos-financeiros.')->group(function (): void {
+            Route::get('/', [LancamentoFinanceiroController::class, 'index'])->name('index');
+            Route::get('/{lancamento}', [LancamentoFinanceiroController::class, 'show'])->name('show');
+            Route::post('/{lancamento}/aprovar', [LancamentoFinanceiroController::class, 'approve'])->name('approve');
+            Route::post('/{lancamento}/rejeitar', [LancamentoFinanceiroController::class, 'reject'])->name('reject');
+            Route::put('/{lancamento}/competencia', [LancamentoFinanceiroController::class, 'adjustCompetencia'])->name('competencia');
         });
     });
 });

@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Domain\Finance\Models\ContaBancaria;
+use App\Domain\Finance\Models\LancamentoFinanceiro;
 use App\Domain\Finance\Policies\ContaBancariaPolicy;
+use App\Domain\Finance\Policies\LancamentoFinanceiroPolicy;
 use App\Domain\FreightContracts\Models\ContratoFreteCarreto;
 use App\Domain\FreightContracts\Policies\ContratoFreteCarretoPolicy;
 use App\Domain\LoadingOrders\Contracts\GoogleDriveClient;
@@ -52,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(UsuarioFilial::class, UsuarioFilialPolicy::class);
         Gate::policy(Pessoa::class, PessoaPolicy::class);
         Gate::policy(ContaBancaria::class, ContaBancariaPolicy::class);
+        Gate::policy(LancamentoFinanceiro::class, LancamentoFinanceiroPolicy::class);
         Gate::policy(Veiculo::class, VeiculoPolicy::class);
         Gate::policy(Implemento::class, ImplementoPolicy::class);
         Gate::policy(ConjuntoTransporte::class, ConjuntoTransportePolicy::class);

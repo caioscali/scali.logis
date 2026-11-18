@@ -29,6 +29,11 @@ enum PerfilAcesso: string
         return in_array($this, [self::Administrador, self::Gerente], true);
     }
 
+    public function podeAprovarLancamento(): bool
+    {
+        return in_array($this, [self::Administrador, self::Gerente], true);
+    }
+
     public static function valores(): array
     {
         return array_column(self::cases(), 'value');
