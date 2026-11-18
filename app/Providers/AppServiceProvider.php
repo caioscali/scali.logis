@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Domain\Finance\Models\ContaBancaria;
 use App\Domain\Finance\Policies\ContaBancariaPolicy;
+use App\Domain\LoadingOrders\Models\OrdemCarregamento;
+use App\Domain\LoadingOrders\Policies\OrdemCarregamentoPolicy;
 use App\Domain\Organizations\Models\UsuarioFilial;
 use App\Domain\Organizations\Models\UsuarioTransportadora;
 use App\Domain\Registry\Models\ConjuntoTransporte;
@@ -45,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Veiculo::class, VeiculoPolicy::class);
         Gate::policy(Implemento::class, ImplementoPolicy::class);
         Gate::policy(ConjuntoTransporte::class, ConjuntoTransportePolicy::class);
+        Gate::policy(OrdemCarregamento::class, OrdemCarregamentoPolicy::class);
 
         RateLimiter::for('login', function (Request $request): Limit {
             return Limit::perMinute(5)->by(
