@@ -3,6 +3,7 @@
 namespace App\Domain\FreightContracts\Services;
 
 use App\Domain\Finance\Services\CadastroContasBancarias;
+use App\Domain\Finance\Services\CadastroLancamentosFinanceiros;
 use App\Domain\FreightContracts\Enums\SituacaoConferencia;
 use App\Domain\FreightContracts\Enums\TipoContratoFrete;
 use App\Domain\FreightContracts\Models\ContratoFreteCarreto;
@@ -21,6 +22,7 @@ class CadastroContratosFreteCarreto
     public function __construct(
         private CadastroOrdensCarregamento $cadastroOrdens,
         private CadastroContasBancarias $cadastroContas,
+        private CadastroLancamentosFinanceiros $cadastroLancamentos,
     ) {}
 
     public function podeConsultar(Request $request, User $usuario, OrdemCarregamento $ordem): bool
@@ -52,7 +54,7 @@ class CadastroContratosFreteCarreto
             'conjuntoTransporte.veiculo', 'conjuntoTransporte.implementos.implemento', 'conjuntoTransporte.contaBancaria',
         ]);
         $dados = $this->dadosContrato($request, $usuario, $ordem);
-        $contratos = $ordem->contratosFrete()->with(['conferidoPor', 'historico.alteradoPor'])->orderBy('tipo')->get();
+        $contratos = $ordem->contratosFrete()->with(['conferidoPor', 'historico.alteradoPor', 'lancamentoFinanceiro'])->orderBy('tipo')->get();
 
         return [
             'dados' => $dados,
@@ -104,6 +106,7 @@ class CadastroContratosFreteCarreto
         $valor = $this->normalizarValor($dados['valor_contrato']);
 
         return DB::transaction(function () use ($usuario, $contrato, $dados, $referencia, $valor): ContratoFreteCarreto {
+            $this->cadastroLancamentos->garantirContratoPodeSerAlterado($contrato);
             $this->registrarHistorico($contrato, $usuario);
             $contrato->update([
                 'numero_contrato' => trim($dados['numero_contrato']),
@@ -114,6 +117,7 @@ class CadastroContratosFreteCarreto
                 'observacoes' => blank($dados['observacoes'] ?? null) ? null : trim((string) $dados['observacoes']),
                 'updated_by' => $usuario->id,
             ]);
+            $this->cadastroLancamentos->cancelarPorAlteracaoContrato($contrato, $usuario);
 
             return $contrato->fresh(['historico']);
         });
@@ -127,8 +131,10 @@ class CadastroContratosFreteCarreto
         }
 
         return DB::transaction(function () use ($contrato, $usuario): ContratoFreteCarreto {
+            $contrato = ContratoFreteCarreto::query()->lockForUpdate()->findOrFail($contrato->id);
             $this->registrarHistorico($contrato, $usuario);
             $contrato->update(['situacao_conferencia' => SituacaoConferencia::Conferido, 'conferido_por' => $usuario->id, 'conferido_em' => now(), 'updated_by' => $usuario->id]);
+            $this->cadastroLancamentos->gerarParaContrato($contrato->fresh(), $usuario);
 
             return $contrato->fresh(['conferidoPor', 'historico']);
         });
@@ -238,6 +244,7 @@ class CadastroContratosFreteCarreto
             'conferido_por' => $contrato->conferidoPor?->name,
             'observacoes' => $contrato->observacoes,
             'historico' => $contrato->historico->map(fn (HistoricoContratoFreteCarreto $item): array => ['id' => $item->id, 'numero_contrato' => $item->numero_contrato, 'valor_contrato' => (string) $item->valor_contrato, 'situacao' => $item->situacao_conferencia, 'alterado_em' => $item->alterado_em?->format('d/m/Y H:i'), 'alterado_por' => $item->alteradoPor?->name])->all(),
+            'lancamento' => $contrato->lancamentoFinanceiro === null ? null : ['id' => $contrato->lancamentoFinanceiro->id, 'competencia' => $contrato->lancamentoFinanceiro->competencia?->format('m/Y'), 'valor' => (string) $contrato->lancamentoFinanceiro->valor, 'situacao' => $contrato->lancamentoFinanceiro->situacao->value, 'situacao_nome' => $contrato->lancamentoFinanceiro->situacao->nome()],
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Domain\FreightContracts\Models;
 
+use App\Domain\Finance\Models\LancamentoFinanceiro;
 use App\Domain\FreightContracts\Enums\SituacaoConferencia;
 use App\Domain\FreightContracts\Enums\TipoContratoFrete;
 use App\Domain\LoadingOrders\Models\OrdemCarregamento;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ContratoFreteCarreto extends Model
 {
@@ -77,5 +79,10 @@ class ContratoFreteCarreto extends Model
     public function historico(): HasMany
     {
         return $this->hasMany(HistoricoContratoFreteCarreto::class, 'contrato_frete_carreto_id');
+    }
+
+    public function lancamentoFinanceiro(): HasOne
+    {
+        return $this->hasOne(LancamentoFinanceiro::class, 'contrato_frete_carreto_id');
     }
 }
